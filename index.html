@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lukas Pham — Shopify Theme Developer</title>
+<meta name="description" content="Shopify theme developer specializing in Liquid, JSON templates, and Storefront API integrations. Browse a live section library of custom Shopify sections.">
+<style>
+  :root {
+    --bg: #f4eee3;
+    --bg-alt: #e6d9c3;
+    --text: #3f4a44;
+    --text-muted: #6e7669;
+    --accent: #55744c;
+    --accent-soft: #dce6d1;
+    --accent-blue: #6e93ac;
+    --border: #d6c7ac;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  header.hero {
+    padding: 88px 0 44px;
+  }
+  header.hero h1 {
+    font-size: 2.1rem;
+    margin: 0 0 8px;
+  }
+  header.hero p.tagline {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  section {
+    padding: 44px 0;
+    border-top: 1px solid var(--border);
+  }
+  section > h2 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin: 0 0 20px;
+  }
+  .about p {
+    margin: 0;
+    max-width: 640px;
+    font-size: 1.05rem;
+  }
+  .skills ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .skills li {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 0.9rem;
+  }
+
+  /* Section Library gallery */
+  .library-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .library-header h2 { margin: 0; }
+  .library-header p {
+    margin: 4px 0 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    max-width: 480px;
+  }
+  .library-header a.repo-link {
+    color: var(--accent-blue);
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  .library-header a.repo-link:hover { text-decoration: underline; }
+
+  .library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .section-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-alt);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .section-card__thumb {
+    aspect-ratio: 4 / 3;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .section-card__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+  }
+  .section-card__body {
+    padding: 18px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
+  }
+  .section-card__tag {
+    align-self: flex-start;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 3px 10px;
+  }
+  .section-card__body h3 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .section-card__body p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    flex-grow: 1;
+  }
+  .section-card__body a {
+    margin-top: 4px;
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .section-card__body a:hover { text-decoration: underline; }
+
+  .cta-banner {
+    border-top: 1px solid var(--border);
+    padding: 48px 0;
+    text-align: center;
+  }
+  .cta-banner h2 {
+    margin: 0 0 8px;
+    font-size: 1.4rem;
+  }
+  .cta-banner p {
+    margin: 0 0 20px;
+    color: var(--text-muted);
+  }
+  .cta-banner a.button {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 999px;
+  }
+
+  .contact a {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1.05rem;
+  }
+  .contact a:hover { text-decoration: underline; }
+  footer {
+    padding: 32px 0 64px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #221d17;
+      --bg-alt: #2e271e;
+      --text: #ede4d3;
+      --text-muted: #b3a793;
+      --accent: #8ab07e;
+      --accent-soft: #33402c;
+      --accent-blue: #8fb4cc;
+      --border: #443a2c;
+    }
+    .cta-banner a.button {
+      color: #14190f;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>Lukas Pham</h1>
+      <p class="tagline">Shopify Theme Developer</p>
+    </header>
+
+    <section class="about">
+      <h2>About</h2>
+      <p>
+        I build and customize Shopify themes — Liquid sections, JSON templates,
+        theme editor schema, and client-side integrations with Shopify's Storefront
+        API. Currently focused on turning Shopify theme development into a freelance
+        practice, taking on small projects for merchants who need custom sections,
+        theme tweaks, and storefront features.
+      </p>
+    </section>
+
+    <section class="skills">
+      <h2>Skills</h2>
+      <ul>
+        <li>Shopify Liquid</li>
+        <li>JSON templates &amp; schema</li>
+        <li>Shopify CLI</li>
+        <li>Theme customization (Dawn / OS 2.0)</li>
+        <li>Storefront API</li>
+        <li>Git &amp; GitHub</li>
+      </ul>
+    </section>
+
+    <section class="library">
+      <div class="library-header">
+        <div>
+          <h2>Section Library</h2>
+          <p>Custom Shopify sections built on the Dawn theme — live, working code, not mockups.</p>
+        </div>
+        <a class="repo-link" href="https://github.com/lukas-pham/dawn-theme-demo" target="_blank" rel="noopener">View full theme repo →</a>
+      </div>
+
+      <div class="library-grid">
+        <div class="section-card">
+          <div class="section-card__thumb">
+            <img src="assets/testimonial-slider.png" alt="Testimonial Slider section preview">
+          </div>
+          <div class="section-card__body">
+            <span class="section-card__tag">Social proof</span>
+            <h3>Testimonial Slider</h3>
+            <p>Block-based carousel with star ratings, swipeable on mobile. Merchants add unlimited testimonials via the theme editor.</p>
+            <a href="https://github.com/lukas-pham/dawn-theme-demo/blob/main/sections/testimonial-slider.liquid" target="_blank" rel="noopener">View code →</a>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-card__thumb">
+            <img src="assets/countdown-banner.png" alt="Countdown Sale Banner section preview">
+          </div>
+          <div class="section-card__body">
+            <span class="section-card__tag">Marketing</span>
+            <h3>Countdown Sale Banner</h3>
+            <p>Merchant-set end date/time with a live JS countdown that auto-switches to an "ended" state — a common ask for sale campaigns.</p>
+            <a href="https://github.com/lukas-pham/dawn-theme-demo/blob/main/sections/countdown-banner.liquid" target="_blank" rel="noopener">View code →</a>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-card__thumb">
+            <img src="assets/api-demo.png" alt="API Demo: Product Feed section preview">
+          </div>
+          <div class="section-card__body">
+            <span class="section-card__tag">API integration</span>
+            <h3>API Demo: Product Feed</h3>
+            <p>Fetches products client-side from Shopify's Storefront <code>/products.json</code> endpoint with <code>fetch()</code> and renders them live.</p>
+            <a href="https://github.com/lukas-pham/dawn-theme-demo/blob/main/sections/api-demo-products.liquid" target="_blank" rel="noopener">View code →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta-banner">
+      <h2>Need a custom section for your store?</h2>
+      <p>Let's talk about what you're trying to build.</p>
+      <a class="button" href="mailto:hailuuphl@gmail.com">Get in touch</a>
+    </div>
+
+    <section class="contact">
+      <h2>Contact</h2>
+      <a href="mailto:hailuuphl@gmail.com">hailuuphl@gmail.com</a>
+    </section>
+
+    <footer>
+      &copy; 2026 Lukas Pham
+    </footer>
+  </div>
+</body>
+</html>
