@@ -32,6 +32,23 @@
   }
   header.hero {
     padding: 88px 0 44px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+  .hero__avatar {
+    flex-shrink: 0;
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
   }
   header.hero h1 {
     font-size: 2.1rem;
@@ -40,7 +57,22 @@
   header.hero p.tagline {
     font-size: 1.15rem;
     color: var(--text-muted);
-    margin: 0;
+    margin: 0 0 8px;
+  }
+  .hero__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .hero__status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
   }
   section {
     padding: 44px 0;
@@ -111,6 +143,11 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .section-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.25);
   }
   .section-card__thumb {
     aspect-ratio: 4 / 3;
@@ -124,6 +161,17 @@
     object-fit: cover;
     object-position: top;
     display: block;
+  }
+  .section-card__thumb--pending {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 12px;
+  }
+  .section-card__thumb--pending span {
+    font-size: 0.85rem;
+    color: var(--text-muted);
   }
   .section-card__body {
     padding: 18px 20px 20px;
@@ -198,6 +246,17 @@
     font-size: 0.85rem;
     border-top: 1px solid var(--border);
   }
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+  }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #221d17;
@@ -218,11 +277,15 @@
 <body>
   <div class="wrap">
     <header class="hero">
-      <h1>Lukas Pham</h1>
-      <p class="tagline">Shopify Theme Developer</p>
+      <div class="hero__avatar" aria-hidden="true">LP</div>
+      <div>
+        <h1>Lukas Pham</h1>
+        <p class="tagline">Shopify Theme Developer</p>
+        <span class="hero__status">Open for freelance work</span>
+      </div>
     </header>
 
-    <section class="about">
+    <section class="about reveal">
       <h2>About</h2>
       <p>
         I build and customize Shopify themes — Liquid sections, JSON templates,
@@ -233,7 +296,7 @@
       </p>
     </section>
 
-    <section class="skills">
+    <section class="skills reveal">
       <h2>Skills</h2>
       <ul>
         <li>Shopify Liquid</li>
@@ -245,7 +308,7 @@
       </ul>
     </section>
 
-    <section class="library">
+    <section class="library reveal">
       <div class="library-header">
         <div>
           <h2>Section Library</h2>
@@ -262,7 +325,8 @@
           <div class="section-card__body">
             <span class="section-card__tag">Social proof</span>
             <h3>Testimonial Slider</h3>
-            <p>Block-based carousel with star ratings, swipeable on mobile. Merchants add unlimited testimonials via the theme editor.</p>
+            <p><strong>Problem:</strong> merchants want reviews visible on key pages, but static review blocks can't be reordered or restyled without a rebuild.</p>
+            <p><strong>Solution:</strong> a block-based carousel — each testimonial (quote, rating, author, role) is its own block, added/reordered/removed from the theme editor with no code changes.</p>
             <a href="https://github.com/lukas-pham/dawn-theme-demo/blob/main/sections/testimonial-slider.liquid" target="_blank" rel="noopener">View code →</a>
           </div>
         </div>
@@ -274,7 +338,8 @@
           <div class="section-card__body">
             <span class="section-card__tag">Marketing</span>
             <h3>Countdown Sale Banner</h3>
-            <p>Merchant-set end date/time with a live JS countdown that auto-switches to an "ended" state — a common ask for sale campaigns.</p>
+            <p><strong>Problem:</strong> sale campaigns need real urgency, but a static "Sale ends soon" banner doesn't create time pressure — and needs a developer to update or retire.</p>
+            <p><strong>Solution:</strong> a merchant-set end date/time drives a live JS countdown (days/hours/min/sec) that auto-switches to an "ended" state on its own, reusable for the next campaign.</p>
             <a href="https://github.com/lukas-pham/dawn-theme-demo/blob/main/sections/countdown-banner.liquid" target="_blank" rel="noopener">View code →</a>
           </div>
         </div>
@@ -286,14 +351,28 @@
           <div class="section-card__body">
             <span class="section-card__tag">API integration</span>
             <h3>API Demo: Product Feed</h3>
-            <p>Fetches products client-side from Shopify's Storefront <code>/products.json</code> endpoint with <code>fetch()</code> and renders them live.</p>
+            <p><strong>Problem:</strong> some feature requests (custom widgets, cross-page product feeds) need product data the normal server-rendered Liquid blocks can't reach on their own.</p>
+            <p><strong>Solution:</strong> a section that calls Shopify's Storefront <code>/products.json</code> endpoint client-side with <code>fetch()</code> and renders the results live in the DOM.</p>
             <a href="https://github.com/lukas-pham/dawn-theme-demo/blob/main/sections/api-demo-products.liquid" target="_blank" rel="noopener">View code →</a>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-card__thumb section-card__thumb--pending">
+            <span>Screenshot coming soon</span>
+          </div>
+          <div class="section-card__body">
+            <span class="section-card__tag">Conversion</span>
+            <h3>Sticky Add-to-Cart Bar</h3>
+            <p><strong>Problem:</strong> on long product pages, the buy button scrolls out of view — shoppers have to scroll back up just to add to cart.</p>
+            <p><strong>Solution:</strong> a bar that appears once the main product info scrolls out of view, mirrors the selected variant's price/image live through Dawn's own event system, and proxies to the page's real add-to-cart form instead of duplicating cart logic.</p>
+            <a href="https://github.com/lukas-pham/dawn-theme-demo/blob/main/sections/sticky-add-to-cart.liquid" target="_blank" rel="noopener">View code →</a>
           </div>
         </div>
       </div>
     </section>
 
-    <div class="cta-banner">
+    <div class="cta-banner reveal">
       <h2>Need a custom section for your store?</h2>
       <p>Let's talk about what you're trying to build.</p>
       <a class="button" href="mailto:hailuuphl@gmail.com">Get in touch</a>
@@ -308,5 +387,26 @@
       &copy; 2026 Lukas Pham
     </footer>
   </div>
+
+  <script>
+    if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches && 'IntersectionObserver' in window) {
+      var revealObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll('.reveal').forEach(function (el) {
+        revealObserver.observe(el);
+      });
+    } else {
+      document.querySelectorAll('.reveal').forEach(function (el) {
+        el.classList.add('is-visible');
+      });
+    }
+  </script>
 </body>
 </html>
