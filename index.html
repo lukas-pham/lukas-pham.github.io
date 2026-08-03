@@ -165,6 +165,17 @@
     object-position: top;
     display: block;
   }
+  .section-card__thumb--pending {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 12px;
+  }
+  .section-card__thumb--pending span {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
   .section-card__thumb::after {
     content: "View details \2192";
     position: absolute;
@@ -451,6 +462,32 @@
             <a href="https://github.com/lukas-pham/dawn-theme-demo/blob/main/sections/sticky-add-to-cart.liquid" target="_blank" rel="noopener">View code →</a>
           </div>
         </div>
+
+        <div class="section-card">
+          <div class="section-card__thumb section-card__thumb--pending">
+            <span>Screenshot coming soon</span>
+          </div>
+          <div class="section-card__body">
+            <span class="section-card__tag">Conversion</span>
+            <h3>Free Shipping Progress Bar</h3>
+            <p><strong>Problem:</strong> merchants want to nudge shoppers toward a free-shipping minimum, but a static "Free shipping over $50" banner doesn't react to what's actually in the cart.</p>
+            <p><strong>Solution:</strong> a progress bar on the cart page that computes how much more is needed live, and stays in sync by re-fetching the cart total through Dawn's own cart-update event whenever items change.</p>
+            <a href="https://github.com/lukas-pham/dawn-theme-demo/blob/main/sections/free-shipping-bar.liquid" target="_blank" rel="noopener">View code →</a>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-card__thumb section-card__thumb--pending">
+            <span>Screenshot coming soon</span>
+          </div>
+          <div class="section-card__body">
+            <span class="section-card__tag">Personalization</span>
+            <h3>Recently Viewed Products</h3>
+            <p><strong>Problem:</strong> shoppers who browse several products often want to circle back to one, but Shopify doesn't track that for them out of the box.</p>
+            <p><strong>Solution:</strong> product pages quietly record their handle to <code>localStorage</code>; a section placed elsewhere reads those handles back and re-fetches each one's live price/image from the Storefront API, so nothing shown is stale.</p>
+            <a href="https://github.com/lukas-pham/dawn-theme-demo/blob/main/sections/recently-viewed.liquid" target="_blank" rel="noopener">View code →</a>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -521,6 +558,7 @@
         var paragraphs = card.querySelectorAll('.section-card__body p');
         var link = card.querySelector('.section-card__body a');
 
+        modalImage.hidden = !img;
         modalImage.src = img ? img.src : '';
         modalImage.alt = img ? img.alt : '';
         modalTag.textContent = tag ? tag.textContent : '';
