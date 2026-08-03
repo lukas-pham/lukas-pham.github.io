@@ -143,13 +143,16 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
     transition: transform 0.18s ease, box-shadow 0.18s ease;
   }
-  .section-card:hover {
+  .section-card:hover,
+  .section-card:focus-visible {
     transform: translateY(-3px);
     box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.25);
   }
   .section-card__thumb {
+    position: relative;
     aspect-ratio: 4 / 3;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
@@ -162,16 +165,23 @@
     object-position: top;
     display: block;
   }
-  .section-card__thumb--pending {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 12px;
+  .section-card__thumb::after {
+    content: "View details \2192";
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
   }
-  .section-card__thumb--pending span {
-    font-size: 0.85rem;
-    color: var(--text-muted);
+  .section-card:hover .section-card__thumb::after,
+  .section-card:focus-visible .section-card__thumb::after {
+    opacity: 1;
+    transform: none;
   }
   .section-card__body {
     padding: 18px 20px 20px;
@@ -246,6 +256,78 @@
     font-size: 0.85rem;
     border-top: 1px solid var(--border);
   }
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(20, 16, 10, 0.6);
+    opacity: 0;
+    transition: opacity 0.18s ease;
+  }
+  .modal-overlay[hidden] { display: none; }
+  .modal-overlay.is-open { opacity: 1; }
+  .modal {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    max-height: 88vh;
+    overflow-y: auto;
+    background: var(--bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    transform: translateY(12px) scale(0.98);
+    transition: transform 0.18s ease;
+  }
+  .modal-overlay.is-open .modal { transform: none; }
+  .modal__close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .modal__media {
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--border);
+  }
+  .modal__media img {
+    width: 100%;
+    display: block;
+  }
+  .modal__body {
+    padding: 22px 24px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .modal__body h3 {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+  .modal__body p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+  .modal__body a {
+    align-self: flex-start;
+    margin-top: 6px;
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .modal__body a:hover { text-decoration: underline; }
   @media (prefers-reduced-motion: no-preference) {
     .reveal {
       opacity: 0;
@@ -358,8 +440,8 @@
         </div>
 
         <div class="section-card">
-          <div class="section-card__thumb section-card__thumb--pending">
-            <span>Screenshot coming soon</span>
+          <div class="section-card__thumb">
+            <img src="assets/sticky-add-to-cart.png" alt="Sticky Add-to-Cart Bar section preview">
           </div>
           <div class="section-card__body">
             <span class="section-card__tag">Conversion</span>
@@ -388,6 +470,19 @@
     </footer>
   </div>
 
+  <div class="modal-overlay" data-modal hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button type="button" class="modal__close" data-modal-close aria-label="Close">&times;</button>
+      <div class="modal__media"><img data-modal-image src="" alt=""></div>
+      <div class="modal__body">
+        <span class="section-card__tag" data-modal-tag></span>
+        <h3 id="modalTitle" data-modal-title></h3>
+        <div data-modal-details></div>
+        <a data-modal-link href="" target="_blank" rel="noopener">View code →</a>
+      </div>
+    </div>
+  </div>
+
   <script>
     if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches && 'IntersectionObserver' in window) {
       var revealObserver = new IntersectionObserver(function (entries) {
@@ -407,6 +502,84 @@
         el.classList.add('is-visible');
       });
     }
+  </script>
+
+  <script>
+    (function () {
+      var overlay = document.querySelector('[data-modal]');
+      var modalImage = overlay.querySelector('[data-modal-image]');
+      var modalTag = overlay.querySelector('[data-modal-tag]');
+      var modalTitle = overlay.querySelector('[data-modal-title]');
+      var modalDetails = overlay.querySelector('[data-modal-details]');
+      var modalLink = overlay.querySelector('[data-modal-link]');
+      var lastFocused = null;
+
+      function openModal(card) {
+        var img = card.querySelector('.section-card__thumb img');
+        var tag = card.querySelector('.section-card__tag');
+        var title = card.querySelector('h3');
+        var paragraphs = card.querySelectorAll('.section-card__body p');
+        var link = card.querySelector('.section-card__body a');
+
+        modalImage.src = img ? img.src : '';
+        modalImage.alt = img ? img.alt : '';
+        modalTag.textContent = tag ? tag.textContent : '';
+        modalTitle.textContent = title ? title.textContent : '';
+        modalDetails.innerHTML = '';
+        paragraphs.forEach(function (p) {
+          modalDetails.appendChild(p.cloneNode(true));
+        });
+        if (link) {
+          modalLink.href = link.href;
+          modalLink.hidden = false;
+        } else {
+          modalLink.hidden = true;
+        }
+
+        lastFocused = document.activeElement;
+        overlay.hidden = false;
+        requestAnimationFrame(function () {
+          overlay.classList.add('is-open');
+        });
+        document.body.style.overflow = 'hidden';
+        overlay.querySelector('[data-modal-close]').focus();
+      }
+
+      function closeModal() {
+        overlay.classList.remove('is-open');
+        document.body.style.overflow = '';
+        window.setTimeout(function () {
+          overlay.hidden = true;
+        }, 180);
+        if (lastFocused) lastFocused.focus();
+      }
+
+      document.querySelectorAll('.section-card').forEach(function (card) {
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-haspopup', 'dialog');
+
+        card.addEventListener('click', function (event) {
+          if (event.target.closest('a')) return;
+          openModal(card);
+        });
+        card.addEventListener('keydown', function (event) {
+          if (event.target.closest('a')) return;
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openModal(card);
+          }
+        });
+      });
+
+      overlay.addEventListener('click', function (event) {
+        if (event.target === overlay) closeModal();
+      });
+      overlay.querySelector('[data-modal-close]').addEventListener('click', closeModal);
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !overlay.hidden) closeModal();
+      });
+    })();
   </script>
 </body>
 </html>
