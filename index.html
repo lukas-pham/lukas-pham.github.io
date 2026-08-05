@@ -179,17 +179,6 @@
     object-position: top;
     display: block;
   }
-  .section-card__thumb--pending {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 12px;
-  }
-  .section-card__thumb--pending span {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-  }
   .section-card__thumb::after {
     content: "View details \2192";
     position: absolute;
@@ -482,8 +471,8 @@
         </div>
 
         <div class="section-card">
-          <div class="section-card__thumb section-card__thumb--pending">
-            <span>Screenshot coming soon</span>
+          <div class="section-card__thumb">
+            <img src="assets/free-shipping-bar.png" alt="Free Shipping Progress Bar section preview">
           </div>
           <div class="section-card__body">
             <span class="section-card__tag">Conversion</span>
@@ -495,8 +484,8 @@
         </div>
 
         <div class="section-card">
-          <div class="section-card__thumb section-card__thumb--pending">
-            <span>Screenshot coming soon</span>
+          <div class="section-card__thumb">
+            <img src="assets/recently-viewed.png" alt="Recently Viewed Products section preview">
           </div>
           <div class="section-card__body">
             <span class="section-card__tag">Personalization</span>
