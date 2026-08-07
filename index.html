@@ -249,6 +249,131 @@
     transform: translateY(-2px);
   }
 
+  /* Case study showcase */
+  .case-study {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-card);
+    overflow: hidden;
+  }
+  @media screen and (min-width: 780px) {
+    .case-study {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+  }
+  .case-study__media {
+    position: relative;
+    aspect-ratio: 16 / 11;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  @media screen and (min-width: 780px) {
+    .case-study__media {
+      aspect-ratio: auto;
+      border-bottom: none;
+      border-right: 1px solid var(--border);
+    }
+  }
+  .case-study__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+  }
+  .case-study__media-label {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    color: var(--accent-ink);
+    background: var(--accent-alt);
+    border-radius: 4px;
+    padding: 3px 8px;
+  }
+  .case-study__body {
+    padding: 28px 28px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .case-study__tag {
+    align-self: flex-start;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(200, 255, 74, 0.1);
+    border: 1px solid rgba(200, 255, 74, 0.3);
+    border-radius: 999px;
+    padding: 3px 10px;
+  }
+  .case-study__body h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+  .case-study__body p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+  .case-study__list {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .case-study__list li {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+  }
+  .case-study__list li::before {
+    content: "\2192 ";
+    color: var(--accent-alt);
+  }
+  .case-study__actions {
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+  }
+  .case-study__cta {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-ink);
+    background: var(--accent);
+    text-decoration: none;
+    padding: 9px 18px;
+    border-radius: 6px;
+    box-shadow: 4px 4px 0 var(--border-strong);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .case-study__cta:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--border-strong);
+  }
+  .case-study__source {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  .case-study__source:hover { color: var(--accent); text-decoration: underline; }
+
   /* Section Library gallery */
   .library-header {
     display: flex;
@@ -651,6 +776,30 @@
         <li>Storefront API</li>
         <li>Git &amp; GitHub</li>
       </ul>
+    </section>
+
+    <section class="case-study-section reveal">
+      <h2>Case Study</h2>
+      <div class="case-study">
+        <div class="case-study__media">
+          <span class="case-study__media-label">Live page</span>
+          <img src="assets/case-study.png" alt="Orbit case study landing page preview, showing a countdown banner and hero section">
+        </div>
+        <div class="case-study__body">
+          <span class="case-study__tag">Full-page composition</span>
+          <h3>Orbit — a product launch page, built from the section library</h3>
+          <p>Nine sections below are useful on their own, but a real client evaluates layout and composition judgment too. So I composed six of them — countdown banner, hero, marquee, colorway gallery, testimonials, free-shipping bar and sticky add-to-cart — into one live product launch page for a fictional brand.</p>
+          <ul class="case-study__list">
+            <li>Live countdown timer, scrolling trust marquee</li>
+            <li>Free-shipping progress bar and sticky add-to-cart bar sharing one live cart state</li>
+            <li>Same interaction pattern as the real Dawn sections (pub/sub-driven), simplified for a static demo</li>
+          </ul>
+          <div class="case-study__actions">
+            <a class="case-study__cta" href="case-study.html">View the live page →</a>
+            <a class="case-study__source" href="https://github.com/lukas-pham/dawn-theme-demo" target="_blank" rel="noopener">View section source →</a>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="library reveal" id="work">
