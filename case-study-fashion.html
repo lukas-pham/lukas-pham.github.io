@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study: Meridian — Lukas Pham</title>
+<meta name="description" content="A composed Shopify landing page for a fictional capsule-wardrobe brand, built from sections in the dawn-theme-demo section library.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4efe5;
+    --bg-card: #ffffff;
+    --bg-dark: #201d18;
+    --ink: #201d18;
+    --ink-muted: #736b5c;
+    --accent: #a8583a;
+    --accent-ink: #f4efe5;
+    --olive: #6b6a45;
+    --border: #e5ddcc;
+    --radius: 14px;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+  a { color: inherit; }
+  img, svg { max-width: 100%; display: block; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* Meta bar */
+  .meta-bar {
+    background: var(--bg-dark);
+    color: #e8e2d3;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+  .meta-bar__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 10px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .meta-bar a { text-decoration: none; color: #e0a877; white-space: nowrap; }
+  .meta-bar a:hover { text-decoration: underline; }
+  .meta-bar__label { color: #a49a86; flex: 1 1 260px; }
+
+  section { padding: clamp(64px, 10vw, 104px) 0; }
+  section.wrap {
+    padding-top: clamp(64px, 10vw, 104px);
+    padding-bottom: clamp(64px, 10vw, 104px);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin: 0 0 12px;
+  }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 600; margin: 0; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    padding: 13px 26px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn--primary { background: var(--accent); color: #fff; box-shadow: 0 6px 0 rgba(0,0,0,0.14); }
+  .btn--primary:hover { transform: translateY(-2px); box-shadow: 0 8px 0 rgba(0,0,0,0.14); }
+  .btn--primary:active { transform: translateY(1px); box-shadow: 0 3px 0 rgba(0,0,0,0.14); }
+  .btn--dark { background: #e0a877; color: #201d18; box-shadow: 0 6px 0 rgba(0,0,0,0.3); }
+  .btn--dark:hover { transform: translateY(-2px); box-shadow: 0 8px 0 rgba(0,0,0,0.3); }
+  .btn--ghost { background: transparent; border-color: var(--border); color: var(--ink); }
+  .btn--ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Countdown */
+  .cs-countdown {
+    background: var(--bg-dark);
+    color: #f1ece0;
+    text-align: center;
+    padding: 56px 0;
+  }
+  .cs-countdown .eyebrow { color: #e0a877; }
+  .cs-countdown h2 { font-size: clamp(1.7rem, 4vw, 2.4rem); margin-bottom: 10px; }
+  .cs-countdown p.sub { margin: 0 0 28px; color: #b3aa97; max-width: 480px; margin-left: auto; margin-right: auto; }
+  .countdown-timer { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+  .countdown-timer__unit {
+    min-width: 84px;
+    padding: 14px 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .countdown-timer__value {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 2.2rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .countdown-timer__label {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #a49a86;
+  }
+  .cs-countdown__expired { display: none; font-size: 1.3rem; margin: 0 0 28px; }
+
+  /* Hero */
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  @media (min-width: 860px) {
+    .hero { grid-template-columns: 0.85fr 1.15fr; gap: 64px; }
+  }
+  .hero__media {
+    aspect-ratio: 4/5;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--bg-card);
+    position: relative;
+  }
+  .hero__media img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+  .hero__media-tag {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: #201d18;
+    background: rgba(244,239,229,0.92);
+    border-radius: 999px;
+    padding: 6px 12px;
+  }
+  .hero h1 { font-size: clamp(2rem, 4.2vw, 3rem); line-height: 1.08; margin-bottom: 18px; }
+  .hero__body { margin: 0 0 26px; color: var(--ink-muted); font-size: 1.05rem; max-width: 46ch; }
+  .hero__badges {
+    list-style: none;
+    margin: 0 0 30px;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .hero__badges li {
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    border-radius: 999px;
+    padding: 7px 14px;
+  }
+  .hero__badges li::before { content: "\2713"; margin-right: 6px; color: var(--accent); }
+  .hero__price { font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-muted); margin-top: 14px; }
+
+  /* Marquee */
+  .marquee-section { padding: 0; background: var(--olive); color: #f1ece0; overflow: hidden; }
+  .marquee-track { display: flex; width: max-content; animation: marquee-scroll 26s linear infinite; padding: 16px 0; }
+  .marquee-group { display: flex; align-items: center; flex-shrink: 0; }
+  .marquee-item {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    padding: 0 1.4rem;
+  }
+  .marquee-dot { opacity: 0.5; }
+  @keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .marquee-track { animation-play-state: paused; } }
+
+  /* Product gallery */
+  .section-head { margin-bottom: 32px; text-align: center; }
+  .section-head h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 8px 0 10px; }
+  .section-head p { margin: 0; color: var(--ink-muted); max-width: 46ch; margin-left: auto; margin-right: auto; }
+  .capsule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 22px;
+  }
+  .capsule-card {
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--ink);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .capsule-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(32,29,24,0.12); }
+  .capsule-card__media { aspect-ratio: 4/5; overflow: hidden; background: var(--bg); }
+  .capsule-card__media img {
+    width: 100%; height: 100%; object-fit: cover; object-position: top center;
+    transition: transform 0.35s ease;
+  }
+  .capsule-card:hover .capsule-card__media img { transform: scale(1.04); }
+  .capsule-card__body { padding: 16px 18px 20px; }
+  .capsule-card__body h3 { font-size: 1.05rem; margin-bottom: 4px; }
+  .capsule-card__body p { margin: 0; font-size: 0.85rem; color: var(--ink-muted); font-family: var(--font-mono); }
+
+  /* Testimonials */
+  .testimonial-section { background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .testimonial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; }
+  .testimonial-card {
+    padding: 28px 24px;
+    border-radius: var(--radius);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .testimonial-card__stars { color: #b3823a; letter-spacing: 0.15em; font-size: 1.1rem; }
+  .testimonial-card__quote { margin: 0; font-style: italic; flex-grow: 1; }
+  .testimonial-card__author { margin: 0; font-weight: 600; font-size: 0.92rem; }
+  .testimonial-card__role { margin: 0; color: var(--ink-muted); font-size: 0.82rem; }
+
+  /* Live demo */
+  .demo-section { background: var(--bg-dark); color: #f1ece0; }
+  .demo-panel { display: grid; grid-template-columns: 1fr; gap: 32px; }
+  @media (min-width: 780px) { .demo-panel { grid-template-columns: 1fr 1fr; } }
+  .demo-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius);
+    padding: 26px 26px 28px;
+  }
+  .demo-card h3 { font-size: 1.15rem; margin-bottom: 8px; }
+  .demo-card p.demo-desc { margin: 0 0 20px; color: #a49a86; font-size: 0.92rem; }
+  .fsb__message { margin: 0 0 10px; font-family: var(--font-mono); font-size: 0.85rem; color: #e0a877; }
+  .fsb__track { height: 10px; border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; margin-bottom: 18px; }
+  .fsb__fill { display: block; height: 100%; width: 0%; border-radius: inherit; background: #e0a877; transition: width 0.35s ease; }
+  .demo-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .demo-cart-total { font-family: var(--font-mono); font-size: 0.85rem; color: #a49a86; }
+  .demo-reset { background: none; border: none; color: #a49a86; font-family: var(--font-mono); font-size: 0.78rem; text-decoration: underline; cursor: pointer; padding: 0; }
+  .demo-reset:hover { color: #f1ece0; }
+
+  /* Sticky add to cart */
+  .sticky-atc {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
+    transform: translateY(110%);
+    transition: transform 0.25s ease;
+  }
+  .sticky-atc.is-visible { transform: translateY(0); }
+  .sticky-atc__inner { max-width: 1100px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 16px; }
+  .sticky-atc__swatch { width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0; overflow: hidden; }
+  .sticky-atc__swatch img { width: 100%; height: 100%; object-fit: cover; }
+  .sticky-atc__title { flex-grow: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sticky-atc__price { flex-shrink: 0; font-family: var(--font-mono); color: var(--ink-muted); }
+  @media (max-width: 640px) { .sticky-atc__title { display: none; } }
+
+  /* CTA footer */
+  .cs-cta { text-align: center; padding: 64px 0 40px; }
+  .cs-cta h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); margin-bottom: 10px; }
+  .cs-cta p { margin: 0 0 26px; color: var(--ink-muted); }
+  .cs-foot {
+    border-top: 1px solid var(--border);
+    padding: 24px 0 60px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+  }
+  .cs-foot a { color: var(--accent); text-decoration: none; }
+  .cs-foot a:hover { text-decoration: underline; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .reveal.is-visible { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="meta-bar">
+    <div class="meta-bar__inner">
+      <a href="index.html">&larr; Back to portfolio</a>
+      <span class="meta-bar__label">Case study &mdash; a fictional capsule-wardrobe launch page composed from sections in my Dawn section library</span>
+      <a href="index.html#work">View section library &rarr;</a>
+    </div>
+  </div>
+
+  <section class="cs-countdown" data-countdown-banner data-target="2026-08-24 23:59">
+    <div class="wrap">
+      <p class="eyebrow">Meridian &middot; Capsule restock</p>
+      <h2>15% off, preorder week only</h2>
+      <p class="sub">The next capsule restocks in a week. Preorder now and lock in the discount.</p>
+      <div class="countdown-timer" data-countdown-timer role="timer" aria-live="off">
+        <div class="countdown-timer__unit"><span class="countdown-timer__value" data-countdown-days>00</span><span class="countdown-timer__label">Days</span></div>
+        <div class="countdown-timer__unit"><span class="countdown-timer__value" data-countdown-hours>00</span><span class="countdown-timer__label">Hours</span></div>
+        <div class="countdown-timer__unit"><span class="countdown-timer__value" data-countdown-minutes>00</span><span class="countdown-timer__label">Min</span></div>
+        <div class="countdown-timer__unit"><span class="countdown-timer__value" data-countdown-seconds>00</span><span class="countdown-timer__label">Sec</span></div>
+      </div>
+      <p class="cs-countdown__expired" data-countdown-expired>This preorder window has closed &mdash; the capsule is still available at full price.</p>
+      <a class="btn btn--dark" href="#demo">Preorder the capsule &rarr;</a>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="hero reveal" id="hero">
+      <div class="hero__media">
+        <span class="hero__media-tag">Meridian &middot; The Capsule</span>
+        <img src="assets/fashion/hero.jpg" alt="Model wearing a white eyelet blouse and black wide-leg trousers from the Meridian capsule, studio shot">
+      </div>
+      <div class="hero__content">
+        <p class="eyebrow">Meridian</p>
+        <h1>Three pieces. A dozen outfits.</h1>
+        <p class="hero__body">A blazer, a sweater, and a set of everyday basics &mdash; built to mix with each other and with what's already in your closet. No seasonal drops to keep up with, no impulse buys you'll regret. Just fewer, better things.</p>
+        <ul class="hero__badges">
+          <li>Free returns, 30 days</li>
+          <li>Responsibly sourced fabric</li>
+          <li>Ships worldwide</li>
+        </ul>
+        <a class="btn btn--primary" href="#demo">Shop the capsule</a>
+        <p class="hero__price">From $58 &middot; free shipping over $150</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee-section">
+    <div class="marquee-track">
+      <div class="marquee-group">
+        <span class="marquee-item">Free returns, 30 days</span><span class="marquee-dot">&#10022;</span>
+        <span class="marquee-item">Responsibly sourced fabric</span><span class="marquee-dot">&#10022;</span>
+        <span class="marquee-item">Ships worldwide</span><span class="marquee-dot">&#10022;</span>
+        <span class="marquee-item">8,000+ pieces sold</span><span class="marquee-dot">&#10022;</span>
+        <span class="marquee-item">30-day fit guarantee</span><span class="marquee-dot">&#10022;</span>
+      </div>
+      <div class="marquee-group" aria-hidden="true">
+        <span class="marquee-item">Free returns, 30 days</span><span class="marquee-dot">&#10022;</span>
+        <span class="marquee-item">Responsibly sourced fabric</span><span class="marquee-dot">&#10022;</span>
+        <span class="marquee-item">Ships worldwide</span><span class="marquee-dot">&#10022;</span>
+        <span class="marquee-item">8,000+ pieces sold</span><span class="marquee-dot">&#10022;</span>
+        <span class="marquee-item">30-day fit guarantee</span><span class="marquee-dot">&#10022;</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="wrap reveal">
+    <div class="section-head">
+      <p class="eyebrow">Build your capsule</p>
+      <h2>Three pieces, styled to mix</h2>
+      <p>Every piece is cut from the same neutral palette, so any two of them already work together.</p>
+    </div>
+    <div class="capsule-grid">
+      <a class="capsule-card" href="#demo">
+        <div class="capsule-card__media"><img src="assets/fashion/blazer.jpg" alt="Model wearing the Meridian oversized blazer, side profile, studio shot"></div>
+        <div class="capsule-card__body"><h3>The Blazer</h3><p>$148.00</p></div>
+      </a>
+      <a class="capsule-card" href="#demo">
+        <div class="capsule-card__media"><img src="assets/fashion/sweater.jpg" alt="Model pulling on the Meridian ribbed knit sweater"></div>
+        <div class="capsule-card__body"><h3>The Sweater</h3><p>$98.00</p></div>
+      </a>
+      <a class="capsule-card" href="#demo">
+        <div class="capsule-card__media"><img src="assets/fashion/shirt.jpg" alt="Flat lay of the Meridian everyday set: white tee, grey jeans, and ankle boots"></div>
+        <div class="capsule-card__body"><h3>The Everyday Set</h3><p>$128.00</p></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="testimonial-section">
+    <div class="wrap reveal">
+      <div class="section-head">
+        <p class="eyebrow">Social proof</p>
+        <h2>What the capsule crowd says</h2>
+      </div>
+      <div class="testimonial-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-card__stars" aria-hidden="true">★★★★★</div>
+          <p class="testimonial-card__quote">I bought the blazer expecting to wear it maybe twice a month. It's in rotation every week now &mdash; goes over everything.</p>
+          <div><p class="testimonial-card__author">Hana Voss</p><p class="testimonial-card__role">Verified buyer</p></div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-card__stars" aria-hidden="true">★★★★★</div>
+          <p class="testimonial-card__quote">The sweater fabric is heavier than I expected in the best way. Washed it six times, zero pilling.</p>
+          <div><p class="testimonial-card__author">Owen Reyes</p><p class="testimonial-card__role">Verified buyer</p></div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-card__stars" aria-hidden="true">★★★★☆</div>
+          <p class="testimonial-card__quote">Runs slightly oversized, sized down and it's perfect now. Return process was genuinely easy.</p>
+          <div><p class="testimonial-card__author">Priya Deshmukh</p><p class="testimonial-card__role">Verified buyer</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo-section" id="demo">
+    <div class="wrap reveal">
+      <div class="section-head" style="color:#f1ece0;">
+        <p class="eyebrow" style="color:#e0a877;">Try it live</p>
+        <h2 style="color:#f1ece0;">This part actually works</h2>
+        <p style="color:#a49a86;">Add pieces to the demo cart below &mdash; it drives the free-shipping bar here, and the sticky bar at the bottom of the page, both live.</p>
+      </div>
+      <div class="demo-panel">
+        <div class="demo-card">
+          <h3>Free shipping progress</h3>
+          <p class="demo-desc">Threshold: $150. Same logic as <code>free-shipping-bar.liquid</code> &mdash; re-renders on every cart change instead of only on page load.</p>
+          <p class="fsb__message" data-fsb-message>Add $150.00 more to your cart for free shipping!</p>
+          <div class="fsb__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-fsb-track>
+            <span class="fsb__fill" data-fsb-fill></span>
+          </div>
+          <div class="demo-row">
+            <button type="button" class="btn btn--dark" data-demo-add>Add The Blazer &mdash; $148 to cart</button>
+            <span class="demo-cart-total" data-demo-total>Cart: $0.00</span>
+          </div>
+        </div>
+        <div class="demo-card">
+          <h3>Sticky add-to-cart bar</h3>
+          <p class="demo-desc">Scroll back up past the hero image &mdash; a bar pins to the bottom of the viewport, same trigger as <code>sticky-add-to-cart.liquid</code> (IntersectionObserver on the product info block).</p>
+          <p class="demo-desc" style="margin-bottom:0;">Its button feeds the same demo cart as the one on the left, so both stay in sync &mdash; the same pub/sub idea the real sections use, simplified to one shared state object for this static demo.</p>
+          <div class="demo-row" style="margin-top:18px;">
+            <button type="button" class="demo-reset" data-demo-reset>Reset demo cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cs-cta">
+    <div class="wrap">
+      <h2>Like how this comes together?</h2>
+      <p>This page is composed entirely from sections in my Dawn theme library &mdash; happy to build the equivalent for your store.</p>
+      <a class="btn btn--primary" href="mailto:hailuuphl@gmail.com">Get in touch</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="cs-foot">
+      <span>Case study &middot; Lukas Pham, 2026</span>
+      <a href="https://github.com/lukas-pham/dawn-theme-demo" target="_blank" rel="noopener">View section source on GitHub &rarr;</a>
+    </div>
+  </div>
+
+  <div class="sticky-atc" data-sticky-atc>
+    <div class="sticky-atc__inner">
+      <div class="sticky-atc__swatch" aria-hidden="true"><img src="assets/fashion/blazer.jpg" alt=""></div>
+      <div class="sticky-atc__title">The Blazer</div>
+      <div class="sticky-atc__price">$148.00</div>
+      <button type="button" class="btn btn--primary" data-demo-add>Add to cart</button>
+    </div>
+  </div>
+
+  <script>
+    // Countdown timer
+    (function () {
+      var root = document.querySelector('[data-countdown-banner]');
+      if (!root) return;
+      var target = new Date(root.getAttribute('data-target').replace(' ', 'T'));
+      var timer = root.querySelector('[data-countdown-timer]');
+      var expired = root.querySelector('[data-countdown-expired]');
+      var daysEl = root.querySelector('[data-countdown-days]');
+      var hoursEl = root.querySelector('[data-countdown-hours]');
+      var minutesEl = root.querySelector('[data-countdown-minutes]');
+      var secondsEl = root.querySelector('[data-countdown-seconds]');
+
+      function pad(n) { return String(n).padStart(2, '0'); }
+
+      function tick() {
+        var diff = target.getTime() - Date.now();
+        if (isNaN(target.getTime()) || diff <= 0) {
+          timer.style.display = 'none';
+          expired.style.display = 'block';
+          clearInterval(intervalId);
+          return;
+        }
+        var totalSeconds = Math.floor(diff / 1000);
+        daysEl.textContent = pad(Math.floor(totalSeconds / 86400));
+        hoursEl.textContent = pad(Math.floor((totalSeconds % 86400) / 3600));
+        minutesEl.textContent = pad(Math.floor((totalSeconds % 3600) / 60));
+        secondsEl.textContent = pad(totalSeconds % 60);
+      }
+      tick();
+      var intervalId = setInterval(tick, 1000);
+    })();
+
+    // Reveal on scroll
+    (function () {
+      var items = document.querySelectorAll('.reveal');
+      if (!items.length) return;
+      if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches && 'IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+        items.forEach(function (el) { observer.observe(el); });
+      } else {
+        items.forEach(function (el) { el.classList.add('is-visible'); });
+      }
+    })();
+
+    // Shared demo cart: drives free-shipping bar + syncs both add-to-cart buttons
+    (function () {
+      var THRESHOLD = 150;
+      var PRICE = 148;
+      var total = 0;
+
+      var messageEl = document.querySelector('[data-fsb-message]');
+      var fillEl = document.querySelector('[data-fsb-fill]');
+      var trackEl = document.querySelector('[data-fsb-track]');
+      var totalEl = document.querySelector('[data-demo-total]');
+      var addButtons = document.querySelectorAll('[data-demo-add]');
+      var resetButton = document.querySelector('[data-demo-reset]');
+
+      function formatMoney(n) { return '$' + n.toFixed(2); }
+
+      function render() {
+        var percent = Math.min(100, (total / THRESHOLD) * 100);
+        var remaining = Math.max(0, THRESHOLD - total);
+        fillEl.style.width = percent + '%';
+        trackEl.setAttribute('aria-valuenow', Math.round(percent));
+        messageEl.textContent = remaining > 0
+          ? 'Add ' + formatMoney(remaining) + ' more to your cart for free shipping!'
+          : "You've unlocked free shipping!";
+        totalEl.textContent = 'Cart: ' + formatMoney(total);
+      }
+
+      addButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          total += PRICE;
+          render();
+        });
+      });
+
+      if (resetButton) {
+        resetButton.addEventListener('click', function () {
+          total = 0;
+          render();
+        });
+      }
+
+      render();
+
+      var hero = document.getElementById('hero');
+      var stickyBar = document.querySelector('[data-sticky-atc]');
+      if (hero && stickyBar && 'IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          stickyBar.classList.toggle('is-visible', !entries[0].isIntersecting);
+        }, { rootMargin: '-64px 0px 0px 0px' });
+        observer.observe(hero);
+      }
+    })();
+  </script>
+</body>
+</html>

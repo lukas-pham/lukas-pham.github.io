@@ -270,6 +270,11 @@
   }
 
   /* Case study showcase */
+  .case-study-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
   .case-study {
     display: grid;
     grid-template-columns: 1fr;
@@ -800,24 +805,47 @@
     </section>
 
     <section class="case-study-section reveal">
-      <h2>Case Study</h2>
-      <div class="case-study">
-        <div class="case-study__media">
-          <span class="case-study__media-label">Live page</span>
-          <img src="assets/case-study.png" alt="Orbit case study landing page preview, showing a countdown banner and hero section">
+      <h2>Case Studies</h2>
+      <div class="case-study-list">
+        <div class="case-study">
+          <div class="case-study__media">
+            <span class="case-study__media-label">Live page</span>
+            <img src="assets/case-study.png" alt="Orbit case study landing page preview, showing a countdown banner and hero section">
+          </div>
+          <div class="case-study__body">
+            <span class="case-study__tag">Full-page composition</span>
+            <h3>Orbit — a product launch page, built from the section library</h3>
+            <p>Nine sections below are useful on their own, but a real client evaluates layout and composition judgment too. So I composed six of them — countdown banner, hero, marquee, colorway gallery, testimonials, free-shipping bar and sticky add-to-cart — into one live product launch page for a fictional brand.</p>
+            <ul class="case-study__list">
+              <li>Live countdown timer, scrolling trust marquee</li>
+              <li>Free-shipping progress bar and sticky add-to-cart bar sharing one live cart state</li>
+              <li>Same interaction pattern as the real Dawn sections (pub/sub-driven), simplified for a static demo</li>
+            </ul>
+            <div class="case-study__actions">
+              <a class="case-study__cta" href="case-study.html">View the live page →</a>
+              <a class="case-study__source" href="https://github.com/lukas-pham/dawn-theme-demo" target="_blank" rel="noopener">View section source →</a>
+            </div>
+          </div>
         </div>
-        <div class="case-study__body">
-          <span class="case-study__tag">Full-page composition</span>
-          <h3>Orbit — a product launch page, built from the section library</h3>
-          <p>Nine sections below are useful on their own, but a real client evaluates layout and composition judgment too. So I composed six of them — countdown banner, hero, marquee, colorway gallery, testimonials, free-shipping bar and sticky add-to-cart — into one live product launch page for a fictional brand.</p>
-          <ul class="case-study__list">
-            <li>Live countdown timer, scrolling trust marquee</li>
-            <li>Free-shipping progress bar and sticky add-to-cart bar sharing one live cart state</li>
-            <li>Same interaction pattern as the real Dawn sections (pub/sub-driven), simplified for a static demo</li>
-          </ul>
-          <div class="case-study__actions">
-            <a class="case-study__cta" href="case-study.html">View the live page →</a>
-            <a class="case-study__source" href="https://github.com/lukas-pham/dawn-theme-demo" target="_blank" rel="noopener">View section source →</a>
+
+        <div class="case-study">
+          <div class="case-study__media">
+            <span class="case-study__media-label">Live page</span>
+            <img src="assets/case-study-fashion.png" alt="Meridian case study landing page preview, showing a countdown banner and hero section with real product photography">
+          </div>
+          <div class="case-study__body">
+            <span class="case-study__tag">Full-page composition</span>
+            <h3>Meridian — a capsule-wardrobe launch page, with real product photography</h3>
+            <p>Same section library, a different industry and a different visual language — fashion instead of hardware, real (free-licensed) product photography instead of illustration, a warm editorial palette instead of a dark terminal one. Proof the section library isn't tied to one look.</p>
+            <ul class="case-study__list">
+              <li>Media gallery styled as a "build your capsule" product grid</li>
+              <li>Same live free-shipping bar + sticky add-to-cart pairing, different price points</li>
+              <li>New color system and type pairing, same underlying section code</li>
+            </ul>
+            <div class="case-study__actions">
+              <a class="case-study__cta" href="case-study-fashion.html">View the live page →</a>
+              <a class="case-study__source" href="https://github.com/lukas-pham/dawn-theme-demo" target="_blank" rel="noopener">View section source →</a>
+            </div>
           </div>
         </div>
       </div>
