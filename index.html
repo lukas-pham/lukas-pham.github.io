@@ -183,6 +183,13 @@
     transform: translate(-2px, -2px);
     box-shadow: 6px 6px 0 var(--border-strong);
   }
+  .hero__cta--ghost {
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--accent);
+    box-shadow: none;
+  }
+  .hero__cta--ghost:hover { box-shadow: none; background: rgba(200, 255, 74, 0.08); }
   .hero__aside {
     margin: 0;
     font-family: var(--font-mono);
@@ -268,6 +275,97 @@
     border-color: var(--accent);
     transform: translateY(-2px);
   }
+
+  /* AI builder projects */
+  .ai-intro {
+    margin: 0 0 22px;
+    max-width: 680px;
+    color: var(--text-muted);
+  }
+  .ai-intro strong { color: var(--text); }
+  .ai-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  @media screen and (min-width: 760px) {
+    .ai-grid { grid-template-columns: 1fr 1fr; }
+  }
+  .ai-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-card);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .ai-card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+  }
+  .ai-card__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  .ai-card__num {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+  .ai-card h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  .ai-card p {
+    margin: 0;
+    font-size: 0.93rem;
+    color: var(--text-muted);
+  }
+  .ai-card__flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+  }
+  .ai-card__flow span {
+    border-radius: 4px;
+    padding: 2px 7px;
+    border: 1px solid var(--border-strong);
+  }
+  .ai-card__flow .f-code { color: var(--accent); }
+  .ai-card__flow .f-ai { color: #9ab8ff; }
+  .ai-card__flow .f-human { color: var(--accent-alt); }
+  .ai-card__status {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: #ffc56b;
+  }
+  .ai-card__actions {
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+  }
+  .ai-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+  .ai-legend span::before { content: "\25A0 "; }
+  .ai-legend .f-code::before { color: var(--accent); }
+  .ai-legend .f-ai::before { color: #9ab8ff; }
+  .ai-legend .f-human::before { color: var(--accent-alt); }
 
   /* Case study showcase */
   .case-study-list {
@@ -759,6 +857,7 @@
           <div class="hero__row">
             <span class="hero__status">Open for freelance work</span>
             <a class="hero__cta" href="#work">View my work →</a>
+            <a class="hero__cta hero__cta--ghost" href="#ai-projects">AI projects →</a>
           </div>
           <p class="hero__aside">Side quest: chasing high scores in <strong>NES-era platformers</strong>.</p>
         </div>
@@ -800,8 +899,86 @@
         <li>HTML, CSS &amp; JavaScript</li>
         <li>Shopify CLI</li>
         <li>Storefront API</li>
+        <li>Shopify apps (React Router, Polaris)</li>
+        <li>GraphQL Admin API</li>
+        <li>Claude API &amp; agent design</li>
         <li>Git &amp; GitHub</li>
       </ul>
+    </section>
+
+    <section class="ai-section reveal" id="ai-projects">
+      <h2>AI Builder Projects</h2>
+      <p class="ai-intro">
+        Four apps built with AI — and checked so the AI's output can be trusted.
+        The rule in every one: <strong>AI drafts, code decides, a person approves.</strong>
+        Each page shows what is measured and what is not yet, including what the agents missed.
+      </p>
+      <div class="ai-grid">
+        <article class="ai-card">
+          <div class="ai-card__top">
+            <span class="case-study__tag">Agent system</span>
+            <span class="ai-card__num">01</span>
+          </div>
+          <h3>Agent Develop &amp; Agent Review</h3>
+          <p>One agent turns a requirement into a branch; a second reviews it independently against Built for Shopify rules. Every verdict needs evidence, and the final verdict is computed by code.</p>
+          <div class="ai-card__flow" aria-label="Flow">
+            <span class="f-code">REQ × rules</span><span class="f-human">plan approval</span><span class="f-ai">3 reviewers</span><span class="f-code">verdict</span><span class="f-human">merge</span>
+          </div>
+          <span class="ai-card__status">v0 · tests pass · benchmark pending</span>
+          <div class="ai-card__actions">
+            <a class="case-study__cta" href="ai-agent-review.html">Read the case study →</a>
+          </div>
+        </article>
+
+        <article class="ai-card">
+          <div class="ai-card__top">
+            <span class="case-study__tag">Shopify app</span>
+            <span class="ai-card__num">02</span>
+          </div>
+          <h3>Product Content Assistant</h3>
+          <p>Scores catalog completeness, drafts descriptions, SEO and alt text from existing product data only, and writes to the store after the merchant approves — with one-click undo.</p>
+          <div class="ai-card__flow" aria-label="Flow">
+            <span class="f-code">bulk scan</span><span class="f-ai">draft</span><span class="f-code">no-invented-specs check</span><span class="f-human">approve</span><span class="f-code">queue + undo</span>
+          </div>
+          <span class="ai-card__status">v0 · builds · dev-store test pending</span>
+          <div class="ai-card__actions">
+            <a class="case-study__cta" href="ai-product-content.html">Read the case study →</a>
+          </div>
+        </article>
+
+        <article class="ai-card">
+          <div class="ai-card__top">
+            <span class="case-study__tag">Finance · outside Shopify</span>
+            <span class="ai-card__num">03</span>
+          </div>
+          <h3>Invoice Matching &amp; Payment Proposals</h3>
+          <p>Matches supplier invoices with purchase orders and goods receipts, routes each discrepancy to the right team, and keeps a tamper-evident audit trail. AI extracts and explains; it never decides a match.</p>
+          <div class="ai-card__flow" aria-label="Flow">
+            <span class="f-ai">extract</span><span class="f-code">2/3-way match</span><span class="f-human">resolve</span><span class="f-human">approve (SoD)</span><span class="f-code">CSV</span>
+          </div>
+          <span class="ai-card__status">v0 · 11/11 sample invoices correct · accountant test pending</span>
+          <div class="ai-card__actions">
+            <a class="case-study__cta" href="ai-invoice-matching.html">Read the case study →</a>
+          </div>
+        </article>
+
+        <article class="ai-card">
+          <div class="ai-card__top">
+            <span class="case-study__tag">Shopify app</span>
+            <span class="ai-card__num">04</span>
+          </div>
+          <h3>Store Ops Assistant</h3>
+          <p>Ask about sales, orders and stock inside the Shopify admin. The agent uses fixed queries only, shows its steps, has every number checked against the data, and can only propose changes.</p>
+          <div class="ai-card__flow" aria-label="Flow">
+            <span class="f-ai">≤ 8 tool steps</span><span class="f-code">grounding check</span><span class="f-ai">propose</span><span class="f-human">approve in modal</span>
+          </div>
+          <span class="ai-card__status">v0 · builds · dev-store test pending</span>
+          <div class="ai-card__actions">
+            <a class="case-study__cta" href="ai-store-ops.html">Read the case study →</a>
+          </div>
+        </article>
+      </div>
+      <div class="ai-legend"><span class="f-code">Code decides</span><span class="f-ai">AI helps</span><span class="f-human">A person decides</span></div>
     </section>
 
     <section class="case-study-section reveal">

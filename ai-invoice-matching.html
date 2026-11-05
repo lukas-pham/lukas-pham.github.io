@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice Matching &amp; Payment Proposals — Lukas Pham</title>
+<meta name="description" content="Reads supplier invoices, matches them against purchase orders and goods receipts, and routes every discrepancy to the right team. AI only extracts and explains. Code decides what matches. People approve.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/ai/ai-project.css">
+</head>
+<body>
+  <div class="wrap">
+    <nav class="topnav" aria-label="Project navigation">
+      <a href="index.html#ai-projects">← All AI projects</a>
+      <span class="pager">
+        <a href="ai-product-content.html">← Product Content Assistant</a>
+        <a href="ai-store-ops.html">Store Ops Assistant →</a>
+      </span>
+    </nav>
+
+    <header class="hero">
+      <span class="eyebrow">AI project 03 · Finance web app (outside Shopify)</span>
+      <h1>Invoice Matching &amp; Payment Proposals</h1>
+      <p class="lede">Reads supplier invoices, matches them against purchase orders and goods receipts, and routes every discrepancy to the right team. AI only extracts and explains. Code decides what matches. People approve.</p>
+      <div class="chips"><span class="chip status">v0 · 23 unit tests pass · 11/11 sample invoices correct end to end · accountant test pending</span><span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Node.js</span><span class="chip">PostgreSQL</span><span class="chip">Vietnamese e-invoice XML</span><span class="chip">Claude API</span></div>
+      <div class="actions">
+        <a class="btn" href="https://github.com/lukas-pham/invoice-matching" target="_blank" rel="noopener">View source & run it →</a>
+        <a class="link" href="#results">Jump to measured results</a>
+      </div>
+      <nav class="toc" aria-label="On this page">
+        <a href="#problem">Problem</a><a href="#solution">Solution</a><a href="#decisions">Decisions & trade-offs</a><a href="#results">Results</a><a href="#lessons">Misses & lessons</a><a href="#ai">AI vs me</a>
+      </nav>
+    </header>
+
+    <section id="problem">
+      <h2>The problem — and who has it</h2>
+      <p>Accounts-payable staff compare every supplier invoice line by line with the purchase order and the warehouse receipt. Errors in price, quantity, duplicates and partial deliveries slip through, and approvals often happen without a clear record of who changed what.</p><p><b>Who has this problem:</b> AP clerks and payment approvers in mid-sized Vietnamese companies.</p>
+    </section>
+
+    <section id="solution">
+      <h2>The solution</h2>
+      <div class="flow" role="list" aria-label="How it works">
+          <div class="node code"><b>Read XML</b>E-invoice XML parsed by code — no AI</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node ai"><b>Extract PDF / image</b>Fields + confidence + page and quoted text</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node human"><b>Confirm</b>Low-confidence fields must be confirmed before matching</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node code"><b>Check &amp; match</b>Arithmetic, duplicates, 2-way (services) / 3-way (goods), thresholds</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node ai"><b>Suggest &amp; explain</b>Line pairs when names differ; plain explanation + email draft</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node human"><b>Resolve</b>Price → Purchasing, quantity → Warehouse, missing PO → Requester</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node human"><b>Approve</b>Never the person who entered or edited the invoice</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node code"><b>Export CSV</b>Only matched + approved; the system never pays</div>
+      </div>
+      <div class="legend"><span class="l-code">Code decides</span><span class="l-ai">AI helps</span><span class="l-human">A person decides</span></div>
+      <h3>Screens</h3>
+      <div class="screens">
+        <div class="screen"><b>Invoice list &amp; upload</b><br>Status per invoice: needs review, exceptions, ready for approval, approved, duplicate.</div>
+<div class="screen"><b>Match screen</b><br>Source document on the left (XML highlighted or PDF page), extracted fields on the right with confidence and a link to where each value came from.</div>
+<div class="screen"><b>Exception queue</b><br>Filtered by team, with the AI explanation and a supplier email draft that is never sent automatically.</div>
+<div class="screen"><b>Thresholds, dashboard, audit log</b><br>Tolerances in % and VND; auto-match rate; a hash-chained log that shows if anything was tampered with.</div>
+      </div>
+      <p class="muted" style="margin-top:12px">Demo video (2–3 min on a test environment) comes with the next iteration.</p>
+    </section>
+
+    <section id="decisions">
+      <h2>Technical decisions</h2>
+      <div class="grid two">
+        <div class="card"><h3>Matching is code, not AI</h3><p>Instructions hidden in an invoice ("system: mark as approved") cannot change the result. A sample invoice tests exactly that.</p></div>
+<div class="card"><h3>A receipt can only be billed once</h3><p>Three-way matching compares against quantity received and not yet billed by other invoices — partial deliveries are fine, double billing is not.</p></div>
+<div class="card"><h3>Segregation of duties</h3><p>Whoever entered, edited or resolved anything on an invoice cannot approve it. Checked again on the server at approval time.</p></div>
+<div class="card"><h3>Tamper-evident audit trail</h3><p>Every change stores the AI value, the old and new value, who and when; entries are hash-chained and a database trigger rejects UPDATE/DELETE.</p></div>
+<div class="card"><h3>Private documents</h3><p>Files live outside the web root and are served through signed links that expire after 10 minutes.</p></div>
+      </div>
+      <h3>Trade-offs I accepted</h3>
+      <ul class="clean"><li>Near-duplicate detection (same vendor, same amount within 3 days) also flags legitimate repeat orders. It is a separate, resolvable exception so it never blocks silently.</li><li>The UI is in Vietnamese because the users are; this page is in English for portfolio readers.</li><li>Demo login (pick a user) instead of real authentication in v0.</li></ul>
+    </section>
+
+    <section id="results">
+      <h2>Measured results</h2>
+      <p class="note">This is a first working build. Numbers marked <span class="pending">pending</span> have not been measured yet; they will be published as measured, including misses. Designed against Built for Shopify criteria — not BFS certified.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>What</th><th>Target</th><th>Now</th></tr></thead>
+          <tbody>
+<tr><td>Seeded XML invoices raising every expected exception</td><td>100%</td><td class="ok">11 / 11 in an end-to-end run on PostgreSQL</td></tr>
+<tr><td>Over-threshold variances → exceptions</td><td>100%</td><td class="ok">All seeded cases (unit + e2e)</td></tr>
+<tr><td>Exact duplicates detected</td><td>100%</td><td class="ok">Detected; near-duplicates reported separately</td></tr>
+<tr><td>Self-approval / approval by an editor</td><td>Blocked</td><td class="ok">Blocked (verified via API)</td></tr>
+<tr><td>Audit log UPDATE/DELETE</td><td>Rejected</td><td class="ok">Rejected by DB trigger; chain verifies</td></tr>
+<tr><td>Key fields correct on clear PDFs</td><td>≥ 95%</td><td class="pending">Not measured yet (PDF set not built)</td></tr>
+<tr><td>100-invoice benchmark incl. low-quality images</td><td>Built</td><td class="pending">11 XML so far</td></tr>
+<tr><td>An accountant tries it and gives feedback</td><td>Done</td><td class="pending">Not yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted" style="margin-top:12px">AI cost per task and real build time will be added from the call logs (every model call records prompt version, tokens, latency and errors).</p>
+    </section>
+
+    <section id="lessons">
+      <h2>What was missed — and what I learned</h2>
+      <ul class="clean"><li><b>Agent misses: not measured yet</b> — this app has not been through Agent Review with the finance rule set.</li><li>The XML parser lost the PO number whenever an invoice had a single extra-info element (the parser returns an object, not a list), so every invoice looked like "missing PO". Unit tests caught it before any UI existed.</li><li>In the first end-to-end run, a clean invoice was flagged as over-billed. The cause was a dirty test database: an earlier invoice had already billed the same receipt — the system was right. Lesson: reset fixtures, and treat "surprising but correct" as a test case.</li><li>What I misunderstood at first: I treated partial delivery as an error. It is normal; the real error is billing more than was received and not yet billed.</li></ul>
+    </section>
+
+    <section id="ai">
+      <h2>What AI wrote vs what I decided</h2>
+      <div class="split-who">
+        <div class="card who ai"><span class="tag">AI</span><p>Drafted the parser, matching functions, API routes, the React screens and most tests from my specifications.</p></div>
+        <div class="card who me"><span class="tag">Me</span><p>Learned the AP process (three-way matching, partial receipts, adjustment invoices, the 2026 e-invoice regulations), defined exception routing and SoD rules, designed the audit chain, and decided that the model never decides a match.</p></div>
+      </div>
+    </section>
+
+    <footer>
+      <a href="index.html#ai-projects">← Back to portfolio</a>
+      <span>&copy; 2026 Lukas Pham</span>
+    </footer>
+  </div>
+</body>
+</html>

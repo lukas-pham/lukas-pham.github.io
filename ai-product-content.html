@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Content Assistant — Lukas Pham</title>
+<meta name="description" content="Finds products with thin content, drafts descriptions, SEO fields and image alt text from the data the product already has, and writes to the store only after the merchant approves. Every change can be undone.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/ai/ai-project.css">
+</head>
+<body>
+  <div class="wrap">
+    <nav class="topnav" aria-label="Project navigation">
+      <a href="index.html#ai-projects">← All AI projects</a>
+      <span class="pager">
+        <a href="ai-agent-review.html">← Agent Develop &amp; Agent Review</a>
+        <a href="ai-invoice-matching.html">Invoice Matching &amp; Payment Proposals →</a>
+      </span>
+    </nav>
+
+    <header class="hero">
+      <span class="eyebrow">AI project 02 · Shopify embedded app</span>
+      <h1>Product Content Assistant</h1>
+      <p class="lede">Finds products with thin content, drafts descriptions, SEO fields and image alt text from the data the product already has, and writes to the store only after the merchant approves. Every change can be undone.</p>
+      <div class="chips"><span class="chip status">v0 · builds &amp; type-checks · 13 unit tests pass · not yet run on a dev store</span><span class="chip">React Router</span><span class="chip">Polaris web components</span><span class="chip">App Bridge</span><span class="chip">GraphQL Admin API 2026-10</span><span class="chip">PostgreSQL</span><span class="chip">Claude API</span></div>
+      <div class="actions">
+        <a class="btn" href="https://github.com/lukas-pham/shopify-product-content-assistant" target="_blank" rel="noopener">View source & run it →</a>
+        <a class="link" href="#results">Jump to measured results</a>
+      </div>
+      <nav class="toc" aria-label="On this page">
+        <a href="#problem">Problem</a><a href="#solution">Solution</a><a href="#decisions">Decisions & trade-offs</a><a href="#results">Results</a><a href="#lessons">Misses & lessons</a><a href="#ai">AI vs me</a>
+      </nav>
+    </header>
+
+    <section id="problem">
+      <h2>The problem — and who has it</h2>
+      <p>Large catalogs end up with empty descriptions, missing SEO titles and images without alt text. Writing them by hand takes days; generic AI tools invent materials and sizes that are not true.</p><p><b>Who has this problem:</b> merchants with hundreds of products and no copywriter.</p>
+    </section>
+
+    <section id="solution">
+      <h2>The solution</h2>
+      <div class="flow" role="list" aria-label="How it works">
+          <div class="node code"><b>Scan</b>Bulk operation reads the catalog; each product gets a completeness score</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node human"><b>Select</b>Merchant picks products or &quot;all incomplete&quot;</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node ai"><b>Draft</b>Description, SEO title/description, alt text in the shop&#x27;s voice</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node code"><b>Validate</b>Lengths, allowed HTML, no invented numbers, no sales promises</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node human"><b>Compare &amp; approve</b>Old vs new, edit inline, approve one or all clean drafts</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node code"><b>Write via queue</b>Saves the live &#x27;before&#x27;, retries, handles throttling</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node human"><b>Undo</b>Restore the exact previous content</div>
+      </div>
+      <div class="legend"><span class="l-code">Code decides</span><span class="l-ai">AI helps</span><span class="l-human">A person decides</span></div>
+      <h3>Screens</h3>
+      <div class="screens">
+        <div class="screen"><b>Home</b><br>Is the app working, catalog completeness, drafts waiting, products updated, background progress, AI spend today.</div>
+<div class="screen"><b>Products</b><br>Sorted by completeness with what is missing; select and queue drafts.</div>
+<div class="screen"><b>Review drafts</b><br>Side-by-side comparison, editable fields, blocking problems shown in red next to the field.</div>
+<div class="screen"><b>History &amp; undo / Brand voice</b><br>Every saved change with one-click restore; voice settings use the Contextual Save Bar.</div>
+      </div>
+      <p class="muted" style="margin-top:12px">Demo video (2–3 min on a test environment) comes with the next iteration.</p>
+    </section>
+
+    <section id="decisions">
+      <h2>Technical decisions</h2>
+      <div class="grid two">
+        <div class="card"><h3>No write without approval — enforced twice</h3><p>The write job refuses any draft that is not approved with a reviewer recorded, and the edited draft is re-validated on the server before approval.</p></div>
+<div class="card"><h3>&quot;No invented specs&quot; is checked in code</h3><p>Every number + unit in the output must exist in the product data. Otherwise the draft is blocked until the merchant edits it.</p></div>
+<div class="card"><h3>Durable queue in PostgreSQL</h3><p>Generate / apply / revert are rows in a jobs table, so progress stays correct after reloads or restarts; throttled calls back off longer.</p></div>
+<div class="card"><h3>Undo from the live state</h3><p>Right before writing, the app reads the current content from Shopify and stores it — not the scan-time snapshot.</p></div>
+<div class="card"><h3>APIs verified, not remembered</h3><p>All GraphQL operations were validated against Admin API 2026-10 with the Shopify AI Toolkit; that is how <code>write_files</code> turned out to be required for image alt text.</p></div>
+      </div>
+      <h3>Trade-offs I accepted</h3>
+      <ul class="clean"><li>The number/unit check is deliberately strict and will sometimes block a correct sentence; the merchant edits it. A false block is cheaper than a false claim on a product page.</li><li>The worker runs inside the web process in v0. Simple to deploy, but it should move to its own process before real traffic.</li><li>Translations for multiple markets (nice-to-have) are not built yet.</li></ul>
+    </section>
+
+    <section id="results">
+      <h2>Measured results</h2>
+      <p class="note">This is a first working build. Numbers marked <span class="pending">pending</span> have not been measured yet; they will be published as measured, including misses. Designed against Built for Shopify criteria — not BFS certified.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>What</th><th>Target</th><th>Now</th></tr></thead>
+          <tbody>
+<tr><td>Content without invented specs (50 products)</td><td>≥ 95%</td><td class="pending">Not measured yet</td></tr>
+<tr><td>1,000 products, correct progress through errors/reloads</td><td>Pass</td><td class="pending">Designed (durable queue), not load-tested</td></tr>
+<tr><td>No write before approval</td><td>0 writes</td><td class="pending">Enforced in code; e2e test pending</td></tr>
+<tr><td>Undo restores previous content exactly</td><td>Pass</td><td class="pending">Implemented; e2e test pending</td></tr>
+<tr><td>No revenue or ranking promises in UI</td><td>None</td><td class="ok">UI copy reviewed + validator blocks them in drafts</td></tr>
+<tr><td>Agent Review (project 01)</td><td>Pass</td><td class="pending">Not run yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted" style="margin-top:12px">AI cost per task and real build time will be added from the call logs (every model call records prompt version, tokens, latency and errors).</p>
+    </section>
+
+    <section id="lessons">
+      <h2>What was missed — and what I learned</h2>
+      <ul class="clean"><li><b>Agent misses: not measured yet</b> — this app has not been through Agent Review.</li><li>The official template's TypeScript config did not include the App Bridge types, so <code>s-app-nav</code> failed type-checking. Found by running the type-check, not by reading the code.</li><li>I assumed image alt text could be written with the product write scope. The docs say <code>fileUpdate</code> needs <code>write_files</code>. Lesson: check scopes per mutation in the docs every time.</li></ul>
+    </section>
+
+    <section id="ai">
+      <h2>What AI wrote vs what I decided</h2>
+      <div class="split-who">
+        <div class="card who ai"><span class="tag">AI</span><p>Drafted the routes, Polaris markup, the queue, validators and tests from my specifications.</p></div>
+        <div class="card who me"><span class="tag">Me</span><p>Defined the approval gates, the no-invented-facts rule and its check, the undo model and the scopes; verified every API call against the docs; reviewed the generated code.</p></div>
+      </div>
+    </section>
+
+    <footer>
+      <a href="index.html#ai-projects">← Back to portfolio</a>
+      <span>&copy; 2026 Lukas Pham</span>
+    </footer>
+  </div>
+</body>
+</html>
