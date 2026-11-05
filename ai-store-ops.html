@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Store Ops Assistant — Lukas Pham</title>
+<meta name="description" content="Merchants ask about sales, orders and stock inside the Shopify admin. The agent can only use fixed, pre-validated queries, shows every step, and can only propose changes that the merchant approves.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/ai/ai-project.css">
+</head>
+<body>
+  <div class="wrap">
+    <nav class="topnav" aria-label="Project navigation">
+      <a href="index.html#ai-projects">← All AI projects</a>
+      <span class="pager">
+        <a href="ai-invoice-matching.html">← Invoice Matching &amp; Payment Proposals</a>
+        <a href="ai-agent-review.html">Agent Develop &amp; Agent Review →</a>
+      </span>
+    </nav>
+
+    <header class="hero">
+      <span class="eyebrow">AI project 04 · Shopify embedded app</span>
+      <h1>Store Ops Assistant</h1>
+      <p class="lede">Merchants ask about sales, orders and stock inside the Shopify admin. The agent can only use fixed, pre-validated queries, shows every step, and can only propose changes that the merchant approves.</p>
+      <div class="chips"><span class="chip status">v0 · builds &amp; type-checks · 8 unit tests pass · not yet run on a dev store</span><span class="chip">React Router</span><span class="chip">Polaris web components</span><span class="chip">GraphQL Admin API 2026-10</span><span class="chip">Claude tool use</span><span class="chip">PostgreSQL</span></div>
+      <div class="actions">
+        <a class="btn" href="https://github.com/lukas-pham/shopify-store-ops-assistant" target="_blank" rel="noopener">View source & run it →</a>
+        <a class="link" href="#results">Jump to measured results</a>
+      </div>
+      <nav class="toc" aria-label="On this page">
+        <a href="#problem">Problem</a><a href="#solution">Solution</a><a href="#decisions">Decisions & trade-offs</a><a href="#results">Results</a><a href="#lessons">Misses & lessons</a><a href="#ai">AI vs me</a>
+      </nav>
+    </header>
+
+    <section id="problem">
+      <h2>The problem — and who has it</h2>
+      <p>Small merchants check orders and inventory by hand across several admin pages. Generic AI chat either cannot see the data or makes numbers up — and an agent with write access is a risk.</p><p><b>Who has this problem:</b> store owners and ops staff without an analytics team.</p>
+    </section>
+
+    <section id="solution">
+      <h2>The solution</h2>
+      <div class="flow" role="list" aria-label="How it works">
+          <div class="node human"><b>Ask</b>&quot;How were sales last week?&quot; — customer details are redacted from the question</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node ai"><b>Pick tools (≤ 8)</b>sales_summary, top_products, list_orders, low_stock, slow_movers</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node code"><b>Fixed GraphQL</b>No customer fields requested; order notes redacted and marked untrusted</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node ai"><b>Answer</b>Text + figures with period and source step + chart</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node code"><b>Grounding check</b>Any number not found in tool data → answer marked &quot;could not be checked&quot;</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node ai"><b>Propose</b>Stock adjustment or tags — stored as a pending proposal</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="node human"><b>Approve in modal</b>Exact before → after shown; decision logged</div>
+      </div>
+      <div class="legend"><span class="l-code">Code decides</span><span class="l-ai">AI helps</span><span class="l-human">A person decides</span></div>
+      <h3>Screens</h3>
+      <div class="screens">
+        <div class="screen"><b>Home</b><br>Last 7 days sales, orders and average order computed by code, a sales chart, and a to-do list.</div>
+<div class="screen"><b>Ask</b><br>Answer, figure table with period and source, chart, and the agent&#x27;s steps under &quot;How this was answered&quot;.</div>
+<div class="screen"><b>Suggested actions</b><br>Each proposal opens in an s-modal showing exactly what changes.</div>
+<div class="screen"><b>Activity log / Thresholds</b><br>Append-only record of approvals; low-stock and slow-mover thresholds with the Contextual Save Bar.</div>
+      </div>
+      <p class="muted" style="margin-top:12px">Demo video (2–3 min on a test environment) comes with the next iteration.</p>
+    </section>
+
+    <section id="decisions">
+      <h2>Technical decisions</h2>
+      <div class="grid two">
+        <div class="card"><h3>The model cannot write GraphQL</h3><p>It chooses from typed tools with strict schemas. Unknown tools are rejected; at most 8 tool calls per question.</p></div>
+<div class="card"><h3>Numbers are verified by code</h3><p>The final answer must list each figure with its period and source step; a check compares every number in the text with the tool results.</p></div>
+<div class="card"><h3>Proposals can only target what was seen</h3><p>Write tools accept only IDs returned by read tools in the same run, so an instruction inside an order note cannot point the agent at an arbitrary product.</p></div>
+<div class="card"><h3>Safe writes</h3><p>Inventory changes use <code>@idempotent</code> with the proposal ID and <code>changeFromQuantity</code>, so a double click or a stale view cannot apply twice or overwrite a newer stock count.</p></div>
+<div class="card"><h3>Home without AI</h3><p>The dashboard calls the same tools directly — fast, free and exact.</p></div>
+      </div>
+      <h3>Trade-offs I accepted</h3>
+      <ul class="clean"><li>Order scans stop at 1,000 orders per question and 60 days without <code>read_all_orders</code>; larger shops need ShopifyQL or bulk operations.</li><li>Rejecting answers with unverifiable numbers will sometimes hide a correct rounded figure. Showing a warning is better than showing a wrong number.</li><li>The weekly summary (nice-to-have) is not built yet.</li></ul>
+    </section>
+
+    <section id="results">
+      <h2>Measured results</h2>
+      <p class="note">This is a first working build. Numbers marked <span class="pending">pending</span> have not been measured yet; they will be published as measured, including misses. Designed against Built for Shopify criteria — not BFS certified.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>What</th><th>Target</th><th>Now</th></tr></thead>
+          <tbody>
+<tr><td>30 questions with precomputed answers</td><td>≥ 85% numbers correct</td><td class="pending">Not measured yet</td></tr>
+<tr><td>Writes with a merchant approval record</td><td>100%</td><td class="pending">Enforced in code; e2e test pending</td></tr>
+<tr><td>Shop A session reads shop B data</td><td>Never</td><td class="pending">By design (session admin client + shop_id filter); test pending</td></tr>
+<tr><td>Dangerous instructions in order notes</td><td>No proposal</td><td class="pending">Mitigations in place; adversarial set pending</td></tr>
+<tr><td>Email / phone / address in logs and prompts</td><td>None</td><td class="pending">Redaction unit-tested; log scan pending</td></tr>
+<tr><td>Agent Review (project 01)</td><td>Pass</td><td class="pending">Not run yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted" style="margin-top:12px">AI cost per task and real build time will be added from the call logs (every model call records prompt version, tokens, latency and errors).</p>
+    </section>
+
+    <section id="lessons">
+      <h2>What was missed — and what I learned</h2>
+      <ul class="clean"><li><b>Agent misses: not measured yet</b> — this app has not been through Agent Review.</li><li>The production build failed because a client component imported a constant from a server-only module. Type-checking passed; only the build caught it. Lesson: always run the real build, not just tsc.</li><li>BFS 5.3.1 (Web Pixel for Analytics apps) was added to the project 01 rule set from day one, because this app could be listed under Analytics.</li></ul>
+    </section>
+
+    <section id="ai">
+      <h2>What AI wrote vs what I decided</h2>
+      <div class="split-who">
+        <div class="card who ai"><span class="tag">AI</span><p>Drafted the tool implementations, the agent loop, Polaris screens and tests from my specifications.</p></div>
+        <div class="card who me"><span class="tag">Me</span><p>Chose the tool list and what each may return, the step limit, the grounding check, the propose-only write model and the PII rules; verified every GraphQL operation against the 2026-10 docs.</p></div>
+      </div>
+    </section>
+
+    <footer>
+      <a href="index.html#ai-projects">← Back to portfolio</a>
+      <span>&copy; 2026 Lukas Pham</span>
+    </footer>
+  </div>
+</body>
+</html>
