@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<title>Wholesale Tiers — Shopify Function + Checkout Extension — Lukas Pham</title>
+<meta name="description" content="Tiered wholesale pricing at checkout with a Shopify Discount Function and a Checkout UI Extension, built with Claude Code. Includes the full AI build log and a cart simulator that runs the real Function code.">
+<meta name="theme-color" content="#04071a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/ai/ai-project.css">
+<link rel="stylesheet" href="assets/ai/playground.css">
+</head>
+<body>
+  <div class="wrap">
+    <nav class="topnav" aria-label="Project navigation">
+      <a href="index.html#agents">← All projects</a>
+      <span class="pager">
+        <a href="ai-agent-review.html">← Agent Develop &amp; Agent Review</a>
+        <a href="ai-invoice-matching.html">Invoice Matching →</a>
+      </span>
+    </nav>
+
+    <header class="hero">
+      <span class="eyebrow">Built with AI 08 · Shopify Function · Checkout UI extension</span>
+      <h1>Wholesale Tiers</h1>
+      <p class="lede">Approved wholesale customers get 10% off at 12+ units, 15% at 24+ and 20% at 48+, applied automatically at checkout. A progress bar shows how many more units unlock the next tier. The merchant approves customers in the admin; tiers live in one config read by both the Function and the checkout block.</p>
+      <div class="chips"><span class="chip good">builds · wasm tests 10/10 · unit tests 12/12</span><span class="chip good">Shopify validators pass</span><span class="chip status">not yet on a dev store</span><span class="chip">Discount Function API 2026-07</span><span class="chip">Preact + Polaris web components</span></div>
+      <div class="actions">
+        <a class="btn" href="#playground">Try the cart simulator ↓</a>
+        <a class="link" href="#build-log">AI build log</a>
+        <a class="link" href="https://github.com/lukas-pham/shopify-wholesale-tiers" target="_blank" rel="noopener">Source code →</a>
+      </div>
+      <nav class="toc" aria-label="On this page"><a href="#playground">Simulator</a><a href="#how">How it decides</a><a href="#build-log">Build log</a><a href="#gaps">Known gaps</a></nav>
+    </header>
+
+    <section id="playground">
+      <h2>Cart simulator</h2>
+      <p class="note info">Change quantities and the customer's approval. The page builds the exact input the Function receives at checkout, runs the <b>real Function code</b> from the repo, and applies its output. The progress block uses the same logic as the checkout extension.</p>
+      <div class="pg" data-wholesale-pg>
+        <div class="pg__bar"><span><b>●</b> cart.lines.discounts.generate.run · tiers 12 / 24 / 48 → 10 / 15 / 20%</span><span>runs in your browser</span></div>
+        <div class="pg__grid">
+          <div class="pg-pane pg__main">
+            <label class="sim-toggle"><input type="checkbox" data-approved checked> Customer metafield <code>$app:wholesale_approved</code> = true</label>
+            <div data-lines></div>
+            <details><summary class="caption" style="cursor:pointer">Function input (what Shopify sends)</summary><pre class="pg-json" data-input></pre></details>
+            <details open><summary class="caption" style="cursor:pointer">Function output (what the code returned)</summary><pre class="pg-json" data-output></pre></details>
+          </div>
+          <div class="pg__side"><h4>Checkout</h4><div class="sim-checkout" data-checkout></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <h2>How it decides</h2>
+<pre class="code">customer.$app:wholesale_approved == "true"?        no → no discount
+eligible lines = product variants without the "no-wholesale" tag
+units          = sum of eligible quantities
+tier           = highest tier in shop.$app:wholesale_tiers with minQuantity ≤ units
+→ one product discount on every eligible line: "Wholesale 15% (24+ units)"</pre>
+      <ul class="clean">
+        <li><b>One source of truth.</b> The Function can read customer tags but a checkout extension cannot, so eligibility is an app-owned customer metafield both can read, and the tiers are one shop metafield. Both are declared in <code>shopify.app.toml</code>, so they appear in the admin on install.</li>
+        <li><b>Fail closed.</b> A missing or malformed tier table gives no discount, never a wrong one; any tier above 50% is ignored.</li>
+        <li><b>No personal data</b> reaches the Function: it reads one boolean on the customer.</li>
+      </ul>
+    </section>
+
+    <section id="build-log">
+      <h2>AI build log</h2>
+      <p>Built with Claude Code (Opus 5.5), Shopify's AI Toolkit (docs search + validators), Shopify CLI 5.1 and Shopify's own extension templates. The spec was mine; the code was the agent's; every row below is a check that ran.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Step</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Input query validated against the Discount Function schema 2026-07</td><td class="ok">✓</td></tr>
+          <tr><td>Function + 10 fixtures (guest, not approved, below tier, each tier, mixed cart with excluded and custom items, wrong discount class, missing / broken config)</td><td class="ok">12/12 unit tests</td></tr>
+          <tr><td>First <code>shopify app function build</code></td><td class="pending">✗ <code>[auth]: Required</code> in the app config → added</td></tr>
+          <tr><td>Second build</td><td class="pending">✗ GraphQL codegen had no config — the agent had trimmed the template's <code>codegen</code> block → restored</td></tr>
+          <tr><td>Third build</td><td class="ok">✓ function.wasm, 3.2 KB</td></tr>
+          <tr><td>All 10 fixtures through the compiled wasm with Shopify's test harness (also validates fixtures against the schema)</td><td class="ok">10/10</td></tr>
+          <tr><td>Checkout extension, first validation</td><td class="pending">✗ <code>s-progress</code> got <code>string | any[]</code> as its accessibility label — <code>i18n.translate()</code> can return an array. A real screen-reader bug → fixed</td></tr>
+          <tr><td>Checkout extension, second validation</td><td class="ok">✓ s-banner, s-stack, s-text, s-progress</td></tr>
+          <tr><td><code>shopify app build</code> (both extensions)</td><td class="ok">✓ checkout bundle ≈ 7.8 KB compressed</td></tr>
+          <tr><td>Setup mutations (<code>discountAutomaticAppCreate</code>, <code>metafieldsSet</code>) validated against Admin API 2026-07</td><td class="ok">✓</td></tr>
+        </tbody>
+      </table></div>
+      <p class="muted" style="margin-top:12px">Three of the ten steps failed first time. That is the normal ratio — and why the checks are part of the service, not an extra.</p>
+    </section>
+
+    <section id="gaps">
+      <h2>Known gaps</h2>
+      <ul class="clean">
+        <li>Not installed on a development store yet, so there is no screenshot of the real checkout; the simulator above runs the same Function code.</li>
+        <li>The checkout block counts all units; it cannot see the <code>no-wholesale</code> product tag. With an excluded product in the cart it can promise a tier the Function will not give — try it in the simulator. Fix: a product metafield the extension can read.</li>
+        <li>Reading a customer metafield in checkout needs the app's protected customer data access (level 1) to be approved.</li>
+      </ul>
+    </section>
+
+    <footer>
+      <a href="index.html#agents">← Back to portfolio</a>
+      <span>&copy; 2026 Lukas Pham</span>
+    </footer>
+  </div>
+  <script src="assets/ai/js/wholesale-function.js" defer></script>
+  <script src="assets/ai/js/wholesale.page.js" defer></script>
+</body>
+</html>
